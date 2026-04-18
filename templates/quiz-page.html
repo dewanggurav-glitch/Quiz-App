@@ -1,0 +1,173 @@
+{% extends "base.html" %} {% block content %}
+
+<style>
+  body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgb(176, 255, 244);
+  }
+
+  .quiz-container {
+    width: 100%;
+    max-width: 600px;
+    padding: 20px;
+    text-align: center;
+    
+  }
+
+  .question-box {
+    border: 2px solid #000;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    background-color: rgb(89, 243, 110);
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+  }
+
+  .option {
+    width: 100%;
+    max-width: 350px;
+    padding: 12px;
+    border: 2px solid #000;
+    border-radius: 10px;
+    background: #fff;
+    color: black; /* 🔥 add this */
+    font-weight: 500; /* optional (better visibility) */
+    cursor: pointer;
+  }
+
+  .option.selected {
+    background-color: #cce5ff;
+  }
+  .option.correct {
+    background-color: #9dff9d;
+  }
+  .option.wrong {
+    background-color: #ffb3b3;
+  }
+
+  .submit-btn {
+    margin-top: 30px;
+    padding: 12px 30px;
+    background: black;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+</style>
+
+<div class="quiz-container">
+  <!-- 🔥 Show category -->
+  <h3>Category: {{ category.upper() }}</h3>
+
+  <div class="question-box">
+    <h2 id="questionText">Loading question...</h2>
+  </div>
+
+  <div class="options">
+    <button class="option" data-answer="A" id="optA"></button>
+    <button class="option" data-answer="B" id="optB"></button>
+    <button class="option" data-answer="C" id="optC"></button>
+    <button class="option" data-answer="D" id="optD"></button>
+  </div>
+
+  <button class="submit-btn" onclick="submitAnswer()">Submit</button>
+</div>
+
+<script>
+  let totalQuestions = 0;   // 🔥 add this
+  let index = 0;
+  let category = "{{ category }}"; // 🔥 from Flask
+
+  let correctAnswer = "";
+  let selectedOption = null;
+  let score = 0;
+
+  const questionText = document.getElementById("questionText");
+  const options = document.querySelectorAll(".option");
+
+  function loadQuestion() {
+    fetch(`/quiz/question?category=${category}&index=${index}`)
+      .then((res) => res.json())
+      .then((data) => {
+      if (data.status === "end") {
+        totalQuestions = data.total || index;   // 🔥 fallback safety
+        finishQuiz();
+        return;
+      }
+        
+
+        selectedOption = null;
+
+        options.forEach((opt) => {
+          opt.classList.remove("selected", "correct", "wrong");
+          opt.disabled = false;
+        });
+
+        questionText.innerText = `Q${index + 1}. ${data.question.question}`;
+
+        document.getElementById("optA").innerText =
+          "A. " + data.question.option1;
+        document.getElementById("optB").innerText =
+          "B. " + data.question.option2;
+        document.getElementById("optC").innerText =
+          "C. " + data.question.option3;
+        document.getElementById("optD").innerText =
+          "D. " + data.question.option4;
+
+        correctAnswer = data.question.correct_answer.trim();
+      });
+  }
+
+  options.forEach((option) => {
+    option.addEventListener("click", () => {
+      options.forEach((opt) => opt.classList.remove("selected"));
+      option.classList.add("selected");
+      selectedOption = option;
+    });
+  });
+
+  function submitAnswer() {
+    if (!selectedOption) {
+      alert("Select an option!");
+      return;
+    }
+
+    const userAnswer = selectedOption.innerText.substring(3).trim();
+    options.forEach((opt) => (opt.disabled = true));
+
+    if (userAnswer === correctAnswer) {
+      selectedOption.classList.add("correct");
+      score++;
+    } else {
+      selectedOption.classList.add("wrong");
+
+      options.forEach((opt) => {
+        if (opt.innerText.substring(3).trim() === correctAnswer) {
+          opt.classList.add("correct");
+        }
+      });
+    }
+
+    setTimeout(() => {
+      index++;
+      loadQuestion();
+    }, 1000);
+  }
+
+  function finishQuiz() {
+    // 🔥 Send score to result page
+    window.location.href = `/result?score=${score}&total=${totalQuestions}`;  }
+
+  loadQuestion();
+</script>
+
+{% endblock %}
