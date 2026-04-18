@@ -3,7 +3,6 @@ from db_scripts.queries import get_user, insert_user
 
 auth = Blueprint("auth", __name__)
 
-# 🔐 LOGIN
 @auth.route("/login", methods=["GET", "POST"])
 def login():
     # If already logged in
@@ -25,7 +24,6 @@ def login():
     return render_template("login.html")
 
 
-# 📝 SIGNUP
 @auth.route("/signup", methods=["GET", "POST"])
 def signup():
     if "user" in session:
@@ -50,7 +48,6 @@ def signup():
     return render_template("signup.html")
 
 
-# 🚪 LOGOUT
 @auth.route("/logout")
 def logout():
     session.clear()
