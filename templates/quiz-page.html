@@ -39,8 +39,8 @@
     border: 2px solid #000;
     border-radius: 10px;
     background: #fff;
-    color: black; /* 🔥 add this */
-    font-weight: 500; /* optional (better visibility) */
+    color: black;
+    font-weight: 500; 
     cursor: pointer;
   }
 
@@ -65,7 +65,7 @@
 </style>
 
 <div class="quiz-container">
-  <!-- 🔥 Show category -->
+
   <h3>Category: {{ category.upper() }}</h3>
 
   <div class="question-box">
@@ -83,9 +83,9 @@
 </div>
 
 <script>
-  let totalQuestions = 0;   // 🔥 add this
+  let totalQuestions = 0;   
   let index = 0;
-  let category = "{{ category }}"; // 🔥 from Flask
+  let category = "{{ category }}"; 
 
   let correctAnswer = "";
   let selectedOption = null;
@@ -99,7 +99,7 @@
       .then((res) => res.json())
       .then((data) => {
       if (data.status === "end") {
-        totalQuestions = data.total || index;   // 🔥 fallback safety
+        totalQuestions = data.total || index;   
         finishQuiz();
         return;
       }
@@ -164,7 +164,7 @@
   }
 
   function finishQuiz() {
-    // 🔥 Send score to result page
+
     window.location.href = `/result?score=${score}&total=${totalQuestions}`;  }
 
   loadQuestion();
