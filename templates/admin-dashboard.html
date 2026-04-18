@@ -14,7 +14,6 @@
 <nav class="navbar navbar-dark bg-dark px-4">
     <span class="navbar-brand">Admin Dashboard</span>
 
-    <!-- 🔥 Flask logout route -->
     <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-light btn-sm">
         Logout
     </a>
@@ -46,7 +45,6 @@
             <div class="card p-3 shadow">
                 <h5>Manage Questions</h5>
 
-                <!-- 🔥 Flask routes -->
                 <a href="/add-question" class="btn btn-success w-100 mb-2">Add Question</a>
                 <a href="/update-question" class="btn btn-warning w-100 mb-2">Update Question</a>
                 <a href="/delete-question" class="btn btn-danger w-100">Delete Question</a>
