@@ -4,13 +4,11 @@ import random
 
 quiz = Blueprint("quiz", __name__)
 
-# 🏠 HOME
 @quiz.route("/")
 def home():
     return render_template("index.html")
 
 
-# 📂 CATEGORY PAGE
 @quiz.route("/category")
 def category_page():
     if "user" not in session:
@@ -19,28 +17,25 @@ def category_page():
     return render_template("category.html")
 
 
-# ❓ QUIZ PAGE
 @quiz.route("/quiz")
 def quiz_page():
     if "user" not in session:
         return redirect("/login")
 
     category = request.args.get("category")
-    count = int(request.args.get("count", 5))   # 🔥 get question count
+    count = int(request.args.get("count", 5))   
 
-    session["question_count"] = count           # 🔥 store count
-    session.pop("questions", None)              # reset old quiz
+    session["question_count"] = count           
+    session.pop("questions", None)             
 
     return render_template("quiz-page.html", category=category)
 
 
-# 📡 FETCH QUESTIONS API
 @quiz.route("/quiz/question")
 def get_question():
     category = request.args.get("category")
     index = int(request.args.get("index", 0))
 
-    # 🔥 FIRST TIME LOAD → FETCH + SHUFFLE
     if "questions" not in session:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
@@ -53,16 +48,14 @@ def get_question():
 
         conn.close()
 
-        random.shuffle(questions)   # 🔥 shuffle once
+        random.shuffle(questions)   
         session["questions"] = questions
 
     questions = session["questions"]
 
-    # 🔥 LIMIT QUESTIONS (IMPORTANT)
     limit = session.get("question_count", len(questions))
     questions = questions[:limit]
 
-    # 🔥 END CONDITION
     if index >= len(questions):
         total = len(questions)
         session.pop("questions", None)
@@ -71,7 +64,6 @@ def get_question():
     return {"question": questions[index]}
 
 
-# 🎯 RESULT PAGE
 @quiz.route("/result")
 def result():
     score = int(request.args.get("score", 0))
