@@ -4,7 +4,6 @@ from models.db import get_db_connection
 
 admin = Blueprint("admin", __name__)
 
-# ADMIN LOGIN
 @admin.route("/admin-login", methods=["GET", "POST"])
 def admin_login():
     if request.method == "POST":
@@ -20,7 +19,6 @@ def admin_login():
     return render_template("admin-login.html")
 
 
-# ADMIN DASHBOARD
 @admin.route("/admin")
 def dashboard():
     if "admin" not in session:
@@ -63,7 +61,6 @@ def update_question():
 
     selected_category = request.args.get("category")
 
-    # ✅ UPDATE LOGIC
     if request.method == "POST":
         qid = request.form["id"]
         question = request.form["question"]
@@ -83,7 +80,6 @@ def update_question():
 
         conn.commit()
 
-    # ✅ FILTER LOGIC (IMPORTANT)
     if selected_category:
         cursor.execute(
             "SELECT * FROM questions WHERE category=%s",
@@ -97,7 +93,6 @@ def update_question():
 
     return render_template("update_question.html", questions=questions)
 
-# ✅ SHOW DELETE PAGE
 @admin.route("/delete-question")
 def delete_question():
     conn = get_db_connection()
@@ -111,7 +106,6 @@ def delete_question():
     return render_template("delete_question.html", questions=questions)
 
 
-# ✅ DELETE ACTION
 @admin.route("/delete/<int:id>")
 def delete(id):
     conn = get_db_connection()
